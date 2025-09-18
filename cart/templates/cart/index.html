@@ -10,6 +10,39 @@
         <hr />
       </div>
     </div>
+    
+    <!-- Cart Selection -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <h4>Select Cart:</h4>
+        <div class="btn-group" role="group">
+          {% for cart in template_data.user_carts %}
+            <a href="{% url 'cart.index' %}?cart_id={{ cart.id }}" 
+               class="btn {% if cart.id == template_data.selected_cart.id %}btn-primary{% else %}btn-outline-primary{% endif %}">
+              {{ cart.name }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h4>Create New Cart:</h4>
+        <form method="post" action="{% url 'cart.create' %}" class="d-inline">
+          {% csrf_token %}
+          <div class="input-group">
+            <input type="text" name="cart_name" class="form-control" placeholder="Cart name" required>
+            <button class="btn btn-success" type="submit">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    {% if template_data.selected_cart %}
+    <div class="row mb-3">
+      <div class="col">
+        <h3>{{ template_data.selected_cart.name }}</h3>
+      </div>
+    </div>
+    
     <div class="row m-1">
       <table class="table table-bordered table-striped text-center">
         <thead>
@@ -18,34 +51,47 @@
             <th scope="col">Name</th>
             <th scope="col">Price</th>
             <th scope="col">Quantity</th>
+            <th scope="col">Subtotal</th>
           </tr>
         </thead>
         <tbody>
-          {% for movie in template_data.movies_in_cart %}
+          {% for cart_item in template_data.cart_items %}
           <tr>
-            <td>{{ movie.id }}</td>
-            <td>{{ movie.name }}</td>
-            <td>${{ movie.price }}</td>
-            <td>{{ request.session.cart|get_quantity:movie.id }}
-            </td>
+            <td>{{ cart_item.movie.id }}</td>
+            <td>{{ cart_item.movie.name }}</td>
+            <td>${{ cart_item.movie.price }}</td>
+            <td>{{ cart_item.quantity }}</td>
+            <td>${{ cart_item.movie.price|mul:cart_item.quantity }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center">No items in this cart</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+    
     <div class="row">
       <div class="text-end">
         <a class="btn btn-outline-secondary mb-2"><b>Total to pay:</b> ${{ template_data.cart_total }}</a>
-        {% if template_data.movies_in_cart|length > 0 %}
-        <a href="{% url 'cart.purchase' %}"
-          class="btn bg-dark text-white mb-2">Purchase
+        {% if template_data.cart_items %}
+        <a href="{% url 'cart.purchase' %}?cart_id={{ template_data.selected_cart.id }}"
+          class="btn bg-dark text-white mb-2">Purchase {{ template_data.selected_cart.name }}
         </a>
-        <a href="{% url 'cart.clear' %}">
-          <button class="btn btn-danger mb-2"> Remove all movies from Cart</button>
+        <a href="{% url 'cart.clear' %}?cart_id={{ template_data.selected_cart.id }}">
+          <button class="btn btn-danger mb-2">Clear {{ template_data.selected_cart.name }}</button>
         </a>
         {% endif %}
       </div>
     </div>
+    {% else %}
+    <div class="row">
+      <div class="col text-center">
+        <p>No carts available. Create a cart to get started!</p>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock content %}
