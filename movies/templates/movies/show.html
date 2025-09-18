@@ -15,9 +15,18 @@
               {% csrf_token %}
               <div class="col-auto">
                 <div class="input-group col-auto">
-                  <div class="input-group-text">Quantity
-                    </div>
+                  <div class="input-group-text">Quantity</div>
                   <input type="number" min="1" max="10" class="form-control quantity-input" name="quantity" value="1">
+                </div>
+              </div>
+              <div class="col-auto">
+                <div class="input-group col-auto">
+                  <div class="input-group-text">Cart</div>
+                  <select class="form-select" name="cart_name" required>
+                    <option value="Cart 1">Cart 1</option>
+                    <option value="Cart 2">Cart 2</option>
+                    <option value="Cart 3">Cart 3</option>
+                  </select>
                 </div>
               </div>
               <div class="col-auto">
@@ -51,17 +60,15 @@
             <div class="col-12">
               <div class="card shadow p-3 mb-4 rounded">
                 <div class="card-body">
-                  <b class="text-start">Create a review
-                    </b><br /><br />
-          <form method="POST" action="{% url 'movies.create_review' id=template_data.movie.id %}">
+                  <b class="text-start">Create a review</b><br /><br />
+                  <form method="POST" action="{% url 'movies.create_review' id=template_data.movie.id %}">
                     {% csrf_token %}
                     <p>
                       <label for="comment">Comment:</label>
-            <textarea name="comment" required class="form-control" id="comment"></textarea>
+                      <textarea name="comment" required class="form-control" id="comment"></textarea>
                     </p>
                     <div class="text-center">
-                      <button type="submit"
-                        class="btn bg-dark text-white">
+                      <button type="submit" class="btn bg-dark text-white">
                         Add Review
                       </button>
                     </div>

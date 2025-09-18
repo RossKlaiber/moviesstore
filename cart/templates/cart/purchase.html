@@ -6,9 +6,9 @@
       <div class="col mx-auto mb-3">
         <h2>Purchase Completed</h2>
         <hr />
-        <p>Congratulations, purchase completed. Order
-          number is: <b>#{{ template_data.order_id }}</b>
-        </p>
+        <p>Congratulations, purchase completed for <b>{{ template_data.cart_name }}</b>.</p>
+        <p>Order number is: <b>#{{ template_data.order_id }}</b></p>
+        <a href="{% url 'cart.index' %}" class="btn btn-primary">Back to Carts</a>
       </div>
     </div>
   </div>
