@@ -62,3 +62,13 @@ def delete_review(request, id, review_id):
         user=request.user)
     review.delete()
     return redirect('movies.show', id=id)
+
+def top_comments(request):
+    # “Top” interpreted as most recent across the whole app.
+    # If you later add likes/upvotes, order_by('-likes', '-date').
+    reviews = Review.objects.select_related('user', 'movie').order_by('-date')
+    template_data = {
+        'title': 'Top Comments',
+        'reviews': reviews,
+    }
+    return render(request, 'movies/top_comments.html', {'template_data': template_data})

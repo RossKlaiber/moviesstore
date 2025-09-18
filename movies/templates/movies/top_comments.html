@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Top Comments</h1>
+
+<ul>
+  {% for review in template_data.reviews %}
+    <li style="margin: 0.75rem 0;">
+      <div><strong>{{ review.user.username }}</strong> on <em>{{ review.movie.name }}</em></div>
+      <div style="font-size: 0.9rem; color: #555;">{{ review.date }}</div>
+      <div style="margin-top: 0.25rem;">{{ review.comment }}</div>
+    </li>
+  {% empty %}
+    <li>No comments yet.</li>
+  {% endfor %}
+</ul>
+{% endblock content %}
