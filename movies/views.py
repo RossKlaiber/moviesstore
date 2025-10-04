@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Movie, Review
+from .models import Movie, Review, MoviePetition
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 def index(request):
     search_term = request.GET.get('search')
@@ -61,3 +62,46 @@ def delete_review(request, id, review_id):
     review = get_object_or_404(Review, id=review_id, user=request.user)
     review.delete()
     return redirect('movies.show', id=id)
+
+# Petition views
+def petition_list(request):
+    petitions = MoviePetition.objects.all().order_by('-created_at')
+    
+    template_data = {}
+    template_data['title'] = 'Movie Petitions'
+    template_data['petitions'] = petitions
+    return render(request, 'movies/petition_list.html', {'template_data': template_data})
+
+@login_required
+def create_petition(request):
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        
+        if title and description:
+            petition = MoviePetition()
+            petition.title = title
+            petition.description = description
+            petition.created_by = request.user
+            petition.save()
+            messages.success(request, 'Petition created successfully!')
+            return redirect('movies.petition_list')
+        else:
+            messages.error(request, 'Please fill in both title and description.')
+    
+    template_data = {}
+    template_data['title'] = 'Create Movie Petition'
+    return render(request, 'movies/create_petition.html', {'template_data': template_data})
+
+@login_required
+def vote_petition(request, petition_id):
+    petition = get_object_or_404(MoviePetition, id=petition_id)
+    
+    if petition.has_user_voted(request.user):
+        petition.votes.remove(request.user)
+        messages.info(request, 'Your vote has been removed.')
+    else:
+        petition.votes.add(request.user)
+        messages.success(request, 'Thank you for voting!')
+    
+    return redirect('movies.petition_list')
