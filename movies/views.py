@@ -67,6 +67,11 @@ def delete_review(request, id, review_id):
 def petition_list(request):
     petitions = MoviePetition.objects.all().order_by('-created_at')
     
+    # Add voting status for each petition if user is authenticated
+    if request.user.is_authenticated:
+        for petition in petitions:
+            petition.user_has_voted = petition.has_user_voted(request.user)
+    
     template_data = {}
     template_data['title'] = 'Movie Petitions'
     template_data['petitions'] = petitions
